@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from database.connection import get_db
 from models.models import Staff
 from models.users import UserGreate, UserBase
+from datetime import datetime
 
 
 user_router = APIRouter(
@@ -17,6 +18,7 @@ async def sing_new_user(user: UserGreate, db: Session=Depends(get_db)) -> dict:
         first_name=user.first_name,
         email=user.email,
         password=user.password,
+        salary_increase=datetime.utcnow()
     )
     db.add(new_user)
     db.commit()
