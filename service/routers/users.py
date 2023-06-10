@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.orm import Session
+from auth.hash_password import HashPassword
 
 from database.connection import get_db
 from models.models import Staff
@@ -11,13 +12,15 @@ user_router = APIRouter(
     tags=["User"]
 )
 
+hash_password = HashPassword()
+
 @user_router.post("/signup")
 async def sing_new_user(user: UserGreate, db: Session=Depends(get_db)) -> dict:
     new_user = Staff(
         last_name=user.last_name,
         first_name=user.first_name,
         email=user.email,
-        password=user.password,
+        password=hash_password.create_hash(user.password),
         salary_increase=datetime.utcnow()
     )
     db.add(new_user)
