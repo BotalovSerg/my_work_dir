@@ -7,9 +7,10 @@ from models.models import Staff
 from models.users import UserGreate, TokenResponse
 from datetime import datetime
 from fastapi.security import OAuth2PasswordRequestForm
-from auth.jwt_handler import create_access_token
+from auth.jwt_handler import create_access_token, verify_acces_token
 
 from models.models import Staff
+from auth.authenticate import authenticate
 
 
 user_router = APIRouter(
@@ -38,13 +39,13 @@ async def sing_new_user(user: UserGreate, db: Session=Depends(get_db)) -> dict:
     }
 
 
-@user_router.get("/{id}")
-async def get_one_user(id: int, db: Session=Depends(get_db)) -> dict:
-    user = db.query(Staff).filter(Staff.id==id).first()  
+# @user_router.get("/{id}")
+# async def get_one_user(id: int, db: Session=Depends(get_db)) -> dict:
+#     user = db.query(Staff).filter(Staff.id==id).first()  
 
-    return {
-        "message": user
-    }
+#     return {
+#         "message": user
+#     }
 
 
 @user_router.post("/signin", response_model=TokenResponse)
@@ -57,3 +58,17 @@ async def sign_user_in(user: OAuth2PasswordRequestForm = Depends(), db: Session=
             "access_token": access_token,
             "token_type": "Bearer"
         }
+    
+
+@user_router.post("/salary")
+async def user_salary(id:int, token: str=Depends(authenticate), db: Session=Depends(get_db)) -> dict:
+    user = db.query(Staff).filter(Staff.id==id).first()
+    if user.email == token:
+        print(token)
+        return {
+            "message": user
+        }   
+    
+    return {
+        "message": "Token not user"
+    }
