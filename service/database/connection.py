@@ -1,6 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from pydantic import BaseSettings
+from typing import Optional
+
 
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
@@ -18,3 +21,9 @@ def get_db():
     finally:
         db.close()
 
+class Settings(BaseSettings):
+    SECRET_KEY: Optional[str] = "default"
+
+
+    class Config:
+        env_file = ".env"
