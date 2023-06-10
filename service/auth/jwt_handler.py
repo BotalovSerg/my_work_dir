@@ -9,6 +9,7 @@ from database.connection import Settings
 settings = Settings()
 
 def create_access_token(user: str) -> str:
+    
     payload = {
         "user": user,
         "expires": time.time() + 3600
