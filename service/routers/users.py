@@ -4,7 +4,7 @@ from auth.hash_password import HashPassword
 
 from database.connection import get_db
 from models.models import Staff
-from models.users import UserGreate, TokenResponse
+from models.users import UserGreate, TokenResponse, UserBase
 from datetime import datetime
 from fastapi.security import OAuth2PasswordRequestForm
 from auth.jwt_handler import create_access_token, verify_acces_token
@@ -39,13 +39,18 @@ async def sing_new_user(user: UserGreate, db: Session=Depends(get_db)) -> dict:
     }
 
 
-# @user_router.get("/{id}")
-# async def get_one_user(id: int, db: Session=Depends(get_db)) -> dict:
-#     user = db.query(Staff).filter(Staff.id==id).first()  
-
-#     return {
-#         "message": user
-#     }
+@user_router.get("/")
+async def get_all_user(db: Session=Depends(get_db)) -> dict:
+    users = db.query(Staff).all()
+    res = []  
+    for user in users:
+        res.append({
+            "last_name": user.last_name,
+            "first_name": user.first_name,
+            "email": user.email})
+    return {
+        "message": res
+    }
 
 
 @user_router.post("/signin", response_model=TokenResponse)
